@@ -182,7 +182,9 @@ Buffer.__index = Buffer
 
 --Public Functions--
 
---=======WRITES=======--
+--======CONSTRUCTOR=======--
+
+do
 
 --Constructor for the buffer wrapper.
 function Buffer.new(size:number)
@@ -201,6 +203,10 @@ function Buffer.new(size:number)
 
 	return self
 end
+
+end
+
+--=======WRITES=======--
 
 do
 
@@ -412,6 +418,7 @@ do
 end
 
 --=======READS=======--
+
 do
 
 	--Reads a u8 from read_offset. Optionally leave it blank to read the next u8 it finds.
@@ -643,5 +650,6 @@ do
 		return self[`read_{read_type}`](self, read_offset)
 	end
 end
+
 
 return Buffer
