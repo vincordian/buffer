@@ -1,7 +1,3 @@
-local buffer_module = {}
-buffer_module.__index = buffer_module
-
-do
 --[[
 
 	Notes:
@@ -13,6 +9,7 @@ do
 	
 	You must add your own buffer_module:write_foobar() function & type
 	Variables will be stylised in snake_case, as I like how they look compared to the C++ types
+	*and also because I'm trying out new cases
 	Strings will be max size of u16
 	Strings will be 2 + #string due to the fact of that I need to store a length variable.
 
@@ -38,547 +35,150 @@ do
 	
 ]]
 
+--!strict
+--!native
+--!optimize 2
 
-	--Constants--
 
-	local SIZES = {
 
-		u8 = 1,
-		u16 = 2,
-		u32 = 4,
-		u64 = 8,
 
-		i8 = 1,
-		i16 = 2,
-		i32 = 4,
-		i64 = 8,
 
-		f32 = 4,
-		f64 = 8,
-
-		bool = 1,
-		char = 1,
-
-		--String will take 2 + #string as mentioned above
-		--This is due to the fact that I need to store length of string with u16
-		--Yes I can just set length of read of string but what if you send the script of bee movie
-		--(Meaning bad practice)
-
-	}
-
-
-	local CHARACTERS = {
-
-		"0",
-		"1",
-		"2",
-		"3",
-		"4",
-		"5",
-		"6",
-		"7",
-		"8",
-		"9",
-		"a",
-		"b",
-		"c",
-		"d",
-		"e",
-		"f",
-		"g",
-		"h",
-		"i",
-		"j",
-		"k",
-		"l",
-		"m",
-		"n",
-		"o",
-		"p",
-		"q",
-		"r",
-		"s",
-		"t",
-		"u",
-		"v",
-		"w",
-		"x",
-		"y",
-		"z",
-		"A",
-		"B",
-		"C",
-		"D",
-		"E",
-		"F",
-		"G",
-		"H",
-		"I",
-		"J",
-		"K",
-		"L",
-		"M",
-		"N",
-		"O",
-		"P",
-		"Q",
-		"R",
-		"S",
-		"T",
-		"U",
-		"V",
-		"W",
-		"X",
-		"Y",
-		"Z",
-		"!",
-		"@",
-		"#",
-		"$",
-		"%",
-		"^",
-		"&",
-		"*",
-		"(",
-		")",
-		"-",
-		"_",
-		"=",
-		"+",
-		"[",
-		"]",
-		"{",
-		"}",
-		";",
-		":",
-		"'",
-		"<",
-		">",
-		",",
-		".",
-		"/",
-		"?",
-		"`",
-		"~",
-		" ",
-		"0",
-
-	}
-
-
-	--Types--
-
-	export type buffer_self = {
-
-		buffer:buffer,
-		offset:number,
-		size:number,
-		struct:{[number]:string},
-		current_read_indice:number,
-
-	}
-
-
-	--Public Functions--
-
-	--======CONSTRUCTOR=======--
-
-	do
-
-		--Constructor for the buffer wrapper.
-		function buffer_module.new(size:number)
-
-			assert(type(size) == "number", "Size for buffer is NaN.")
-			assert(size > 0, `Cannot input {size} as buffer size, must be a natural number.`)
-
-			local self = setmetatable({}, buffer_module)
-
-			self.buffer = buffer.create(size)
-			self.offset = 0
-			self.size = size
-			self.struct = {}
-			self.current_read_indice = 1 --Starts at 1, because lua(u) has arrays starting at 1. Just remember!
-
-
-			return self
-		end
-
-	end
-
-	--=======WRITES=======--
-
-	do
-
-
-		--=======UNSIGNED INTEGERS======--
-		--=======UNSIGNED INTEGERS======--
-		--=======UNSIGNED INTEGERS======--
-		--=======UNSIGNED INTEGERS======--
-		--=======UNSIGNED INTEGERS======--
-
-		--Writes a u8 to the buffer
-		function buffer_module:write_u8(u8:number)
-
-			assert(type(u8) == "number", "Unsigned8 is NaN.")
-
-			assert(self.offset + SIZES.u8 <= (self.size :: number), `Buffer overflow while trying to insert {u8} into buffer.`)
-			assert(u8 <= 255, `Unsigned8 {u8} cannot be bigger than 255.`)
-			assert(u8 >= 0, `uints cannot be negative ({u8})`)
-
-
-			buffer.writeu8(self.buffer, self.offset, u8)
-			self.offset += SIZES.u8
-
-			table.insert(self.struct, "u8")
-		end
-
-
-		--Writes a u16 to the buffer
-		function buffer_module:write_u16(u16:number)
-
-			assert(type(u16) == "number", "Unsigned16 is NaN.")
-
-			assert(self.offset + SIZES.u16 <= (self.size :: number), `Buffer overflow while trying to insert {u16} into buffer.`)
-			assert(u16 <= 65_535, `Unsigned16 {u16} cannot be bigger than 65,535.`)
-			assert(u16 >= 0, `uints cannot be negative ({u16})`)
-
-
-			buffer.writeu16(self.buffer, self.offset, u16)
-			self.offset += SIZES.u16
-
-			table.insert(self.struct, "u16")
-		end
-
-
-		--Writes a u32 to the buffer
-		function buffer_module:write_u32(u32:number)
-
-			assert(type(u32) == "number", "Unsigned32 is NaN.")
-
-			assert(self.offset + SIZES.u32 <= (self.size :: number), `Buffer overflow while trying to insert {u32} into buffer.`)
-			assert(u32 <= 4_294_967_295, `Unsigned {u32} cannot be bigger than 4,294,967,295.`)
-			assert(u32 >= 0, `uints cannot be negative ({u32})`)
-
-
-			buffer.writeu32(self.buffer, self.offset, u32)
-			self.offset += SIZES.u32
-
-			table.insert(self.struct, "u32")
-		end
-
-
-		--=======SIGNED INTEGERS=======--
-		--=======SIGNED INTEGERS=======--
-		--=======SIGNED INTEGERS=======--
-		--=======SIGNED INTEGERS=======--
-		--=======SIGNED INTEGERS=======--
-
-
-		--Writes a i8 to the buffer
-		function buffer_module:write_i8(i8:number)
-
-			assert(type(i8) == "number", "Signed8 is NaN.")
-
-			assert(self.offset + SIZES.i8 <= (self.size :: number), `Buffer overflow while trying to insert {i8} into buffer.`)
-			assert(i8 >= -128 and i8 <= 127, `Signed i8 must be between -128 and 127 ({i8})`)
-
-
-			buffer.writei8(self.buffer, self.offset, i8)
-			self.offset += SIZES.i8
-
-			table.insert(self.struct, "i8")
-		end
-
-
-		--Writes a i16 to the buffer
-		function buffer_module:write_i16(i16:number)
-
-			assert(type(i16) == "number", "Signed16 is NaN.")
-
-			assert(self.offset + SIZES.i16 <= (self.size :: number), `Buffer overflow while trying to insert {i16} into buffer.`)
-			assert(i16 >= -32_768 and i16 <= 32_767, `Signed i16 must be between -32,768 and 32,767 ({i16})`)
-
-
-			buffer.writei16(self.buffer, self.offset, i16)
-			self.offset += SIZES.i16
-
-			table.insert(self.struct, "i16")
-		end
-
-
-		--Writes a i32 to the buffer
-		function buffer_module:write_i32(i32:number)
-
-			assert(type(i32) == "number", "Signed32 is NaN.")
-
-			assert(self.offset + SIZES.i32 <= (self.size :: number), `Buffer overflow while trying to insert {i32} into buffer.`)
-			assert(i32 >= -2_147_483_648 and i32 <= 2_147_483_647, `Signed i32 must be between -2,147,483,648 and 2,147,483,647 ({i32})`)
-
-
-			buffer.writei32(self.buffer, self.offset, i32)
-			self.offset += SIZES.i32
-
-			table.insert(self.struct, "i32")
-		end
-
-
-		--=======FLOATS=======--
-		--=======FLOATS=======--
-		--=======FLOATS=======--
-		--=======FLOATS=======--
-		--=======FLOATS=======--
-
-
-		--Writes a f32 to the buffer
-		function buffer_module:writef32(f32:number)
-
-			assert(type(f32) == "number", "Float32 is NaN.")
-
-			assert(self.offset + SIZES.f32 <= (self.size :: number), `Buffer overflow while trying to insert {f32} into buffer.`)
-
-
-			buffer.writef32(self.buffer, self.offset, f32)
-			self.offset += SIZES.f32
-
-			table.insert(self.struct, "f32")
-		end
-
-
-		--Writes a f64 to the buffer
-		function buffer_module:writef64(f64:number)
-
-			assert(type(f64) == "number", "Float32 is NaN.")
-
-			assert(self.offset + SIZES.f64 <= (self.size :: number), `Buffer overflow while trying to insert {f64} into buffer.`)
-
-
-			buffer.writef64(self.buffer, self.offset, f64)
-			self.offset += SIZES.f64
-
-			table.insert(self.struct, "f64")
-		end
-
-
-		--=======MISCELLANEOUS=======--
-		--=======MISCELLANEOUS=======--
-		--=======MISCELLANEOUS=======--
-		--=======MISCELLANEOUS=======--
-		--=======MISCELLANEOUS=======--
-
-
-		--Writes a bool to the buffer
-		function buffer_module:write_bool(bool:{boolean})
-
-			assert(self.offset + SIZES.bool <= (self.size :: number), `Buffer overflow while trying to insert {bool} into buffer.`)
-
-			for i = 0, 7 do
-				buffer.writebits(self.buffer, self.offset * 8 + i, 1, bool and 1 or 0)
-			end
-			
-			self.offset += SIZES.bool
-
-			table.insert(self.struct, "bool")
-		end
-
-
-		--Writes a char to the buffer
-		function buffer_module:write_char(char:string)
-
-			assert(self.offset + SIZES.char <= (self.size :: number), `Buffer overflow while trying to insert {char} into buffer.`)
-			assert(table.find(CHARACTERS, char) ~= nil, `Character not found in character list ({char})`)
-
-
-			--Luau strict type solver says that self.offset in writeu8 is invalid because of 3rd parameter, however it is very valid.
-			buffer.writeu8(self.buffer, self.offset, table.find(CHARACTERS, char))
-			self.offset += SIZES.char
-
-			table.insert(self.struct, "char")
-		end
-
-
-		--Writes a string to the buffer
-		function buffer_module:write_str(str:string)
-
-			assert(type(str) == "string", "String provided is not a string.")
-
-			--Using u16 because I don't think anyone will send a string with a size over 65,355 bytes
-			assert(self.offset + SIZES.u16 + #str <= (self.size :: number), `Buffer overflow while trying to insert {str} into buffer.`)
-			assert(#str <= 65_535, `String size is over 65,535.. What are you doing`)
-
-			--Also using "str" instead of string since string is a lua library.
-			buffer.writeu16(self.buffer, self.offset, #str)
-			self.offset += SIZES.u16 --store length of string for easy access
-
-			buffer.writestring(self.buffer, self.offset, str, #str) --Added 4th parameter for readability, I hate you suphi kaner!!
-			self.offset += #str
-
-			table.insert(self.struct, "str")
-		end
-
-
-	end
-
-	--=======READS=======--
-
-	do
-
-		--Reads a u8 from read_offset. Optionally leave it blank to read the next u8 it finds.
-		function buffer_module:read_u8(read_offset:number?):number?
-
-			local read_indice = table.find(self.struct, "u8", self.current_read_indice) :: number
-			read_offset = read_offset or self:get_read_offset_by_read_indice(read_indice)
-
-			return buffer.readu8(self.buffer, read_offset)
-		end
-
-
-		--Reads a u16 from read_offset. Optionally leave it blank to read the next u16 it finds.
-		function buffer_module:read_u16(read_offset:number?):number?
-
-			local read_indice = table.find(self.struct, "u16", self.current_read_indice) :: number
-			read_offset = read_offset or self:get_read_offset_by_read_indice(read_indice)
-
-			return buffer.readu16(self.buffer, read_offset)
-		end
-
-
-		--Reads a u32 from read_offset. Optionally leave it blank to read the next u32 it finds.
-		function buffer_module:read_u32(read_offset:number?):number?
-
-			local read_indice = table.find(self.struct, "u32", self.current_read_indice) :: number
-			read_offset = read_offset or self:get_read_offset_by_read_indice(read_indice)
-
-			return buffer.readu32(self.buffer, read_offset)
-		end
-
-
-
-		--Reads a i8 from read_offset. Optionally leave it blank to read the next i8 it finds.
-		function buffer_module:read_i8(read_offset:number?):number?
-
-			local read_indice = table.find(self.struct, "i8", self.current_read_indice) :: number
-			read_offset = read_offset or self:get_read_offset_by_read_indice(read_indice)
-
-			return buffer.readi8(self.buffer, read_offset)
-		end
-
-
-		--Reads a i16 from read_offset. Optionally leave it blank to read the next i16 it finds.
-		function buffer_module:read_i16(read_offset:number?):number?
-
-			local read_indice = table.find(self.struct, "i16", self.current_read_indice) :: number
-			read_offset = read_offset or self:get_read_offset_by_read_indice(read_indice)
-
-			return buffer.readi16(self.buffer, read_offset)
-		end
-
-
-		--Reads a i32 from read_offset. Optionally leave it blank to read the next i32 it finds.
-		function buffer_module:read_i32(read_offset:number?):number?
-
-			local read_indice = table.find(self.struct, "i32", self.current_read_indice) :: number
-			read_offset = read_offset or self:get_read_offset_by_read_indice(read_indice)
-
-			return buffer.readi32(self.buffer, read_offset)
-		end
-
-
-		--Reads a f32 from read_offset. Optionally leave it blank to read the next f32 it finds.
-		function buffer_module:read_f32(read_offset:number?):number?
-
-			local read_indice = table.find(self.struct, "f32", self.current_read_indice) :: number
-			read_offset = read_offset or self:get_read_offset_by_read_indice(read_indice)
-
-			return buffer.readf32(self.buffer, read_offset)
-		end
-
-
-
-		--Reads a f64 from read_offset. Optionally leave it blank to read the next f64 it finds.
-		function buffer_module:read_f64(read_offset:number?):number?
-
-			local read_indice = table.find(self.struct, "f64", self.current_read_indice) :: number
-			read_offset = read_offset or self:get_read_offset_by_read_indice(read_indice)
-
-			return buffer.readf64(self.buffer, read_offset)
-		end
-
-
-		--Reads a bool from read_offset. Optionally leave it blank to read the next bool it finds.
-		function buffer_module:read_bool(read_offset:number?):number?
-
-			local read_indice = table.find(self.struct, "bool", self.current_read_indice) :: number
-			read_offset = read_offset or self:get_read_offset_by_read_indice(read_indice)
-
-
-			local bools = {}
-
-			for i = 0, 7 do
-				table.insert(buffer.readbits(self.buffer, read_offset * 8 + i, 1) == 1 and true or false)
-			end
-
-			return bools
-		end
+local INT_RANGES = {
+	
+	i2 = {
 		
-		function buffer_module:read_char(read_offset:number?):string?
-			
-			local read_indice = table.find(self.struct, "char", self.current_read_indice) :: number
-			read_offset = read_offset or self:get_read_offset_by_read_indice(read_indice)
-
-			return buffer.readu8(self.buffer, read_offset)
-		end
-
-
-		--Reads a string from read_offset. Optionally leave it blank to read the next string it finds. Offset should be the position of the u16 string length, the string will be autodetermined.
-		function buffer_module:read_str(read_offset:number?):string?
-
-			local read_indice = table.find((self::buffer_self).struct, "str", self.current_read_indice)
-			read_offset = read_offset or self:get_read_offset_by_read_indice(read_indice)
+		minimum_size = -1,
+		maximum_size = 1
+		
+		
+	},
+	
+}
 
 
-			local str_length = buffer.readu16(self.buffer, read_offset)
+local bit_buffer = {}
+bit_buffer.__index = bit_buffer
 
-			return buffer.readstring(self.buffer, read_offset + SIZES.u16, str_length)
-		end
 
+type self_t = typeof(bit_buffer) & {
+
+	buffer:buffer,
+	bit_offset:number,
+	size:number,
+	
+
+}
+
+
+--[[local function make_read_signed(bits:number)
+	return function(self)
+		local signed = buffer.readbits(self.buffer, self.bit_offset, bits)
+		self.bit_offset += bits
+		return signed - 2^((bits - 1) - 1)
 	end
-
-	--=======MISC=======--
-	do
-		--Returns read offset from 0 to indice. Optionally include a custom_indice parameter for it to use that instead
-		function buffer_module:get_read_offset_by_read_indice(custom_indice:number?):(number, keyof<typeof(SIZES)>|"str")
-
-			local Index_read_indice_stop_point_thing = custom_indice or self.current_read_indice :: number
-
-			local read_offset = 0
-			local read_type = self.struct[Index_read_indice_stop_point_thing]
-
-			assert(Index_read_indice_stop_point_thing <= #self.struct, "Length of custom indice cannot be larger than buffer struct.")
-
-			for Index = 1, Index_read_indice_stop_point_thing :: number - 1 do
-				read_offset += (SIZES[self.struct[Index]]::number)
-
-				if self.struct[Index] == "str" then
-					read_offset += SIZES.u16
-				end
-			end
-
-			return read_offset, read_type :: keyof<typeof(SIZES)>|"str"
-		end
-
-
-		--Reads next buffer indice, regardless of type
-		function buffer_module:read_next_indice():unknown
-
-			local read_offset, read_type = self:get_read_offset_by_read_indice();
-
-			(self::buffer_self).current_read_indice += 1
-
-			return self[`read_{read_type}`](self, read_offset)
-		end
-	end
-
 end
 
 
-return buffer_module
+local function make_write_signed(bits:number)
+	return function(self, signed:number)
+		buffer.writebits(self.buffer, self.bit_offset, bits, signed + 2^((bits - 1) - 1))
+		self.bit_offset += bits
+	end
+end
+
+
+local function make_write_unsigned(bits:number)
+	return function(self, unsigned:number)
+		buffer.writebits(self.buffer, self.bit_offset, bits, unsigned)
+		self.bit_offset += bits
+	end
+end
+
+
+local function make_read_unsigned(bits:number)
+	return function(self)
+		local unsigned = buffer.readbits(self.buffer, self.bit_offset, bits)
+		self.bit_offset -= bits
+		return unsigned
+	end
+end
+
+
+for bit_size = 1, 32 do
+	bit_buffer[`write_i{bit_size}`] = make_write_signed(bit_size)
+	bit_buffer[`read_i{bit_size}`] = make_read_unsigned(bit_size)
+	bit_buffer[`write_u{bit_size}`] = make_write_unsigned(bit_size)
+	bit_buffer[`read_u{bit_size}`] = make_read_unsigned(bit_size)
+end]]
+
+
+function bit_buffer.new(size:number):self_t
+	
+	local self = setmetatable({}, bit_buffer) --had to do it here instead of at return, as I don't think there's any type check for metatables.
+	
+	self.buffer = buffer.create(size)
+	self.size = size
+	self.bit_offset = 0
+	
+	return self
+end
+
+
+
+
+
+--signed: 2^size = how much to subtract
+
+function bit_buffer:write_i2(i2:number) buffer.writebits(self.buffer, self.bit_offset, 2, i2+2^1) self.bit_offset += 2 end
+function bit_buffer:write_i4(i4:number) buffer.writebits(self.buffer, self.bit_offset, 4, i4+2^3) self.bit_offset += 4 end
+function bit_buffer:write_i6(i6:number) buffer.writebits(self.buffer, self.bit_offset, 6, i6+2^5) self.bit_offset += 6 end
+function bit_buffer:write_i8(i8:number) buffer.writebits(self.buffer, self.bit_offset, 8, i8+2^7) self.bit_offset += 8 end
+function bit_buffer:write_i10(i10:number) buffer.writebits(self.buffer, self.bit_offset, 10, i10+2^9) self.bit_offset += 10 end
+function bit_buffer:write_i12(i12:number) buffer.writebits(self.buffer, self.bit_offset, 12, i12+2^11) self.bit_offset += 12 end
+function bit_buffer:write_i14(i14:number) buffer.writebits(self.buffer, self.bit_offset, 14, i14+2^13) self.bit_offset += 14 end
+function bit_buffer:write_i16(i16:number) buffer.writebits(self.buffer, self.bit_offset, 16, i16+2^15) self.bit_offset += 16 end
+function bit_buffer:write_i18(i18:number) buffer.writebits(self.buffer, self.bit_offset, 18, i18+2^17) self.bit_offset += 18 end
+function bit_buffer:write_i20(i20:number) buffer.writebits(self.buffer, self.bit_offset, 20, i20+2^19) self.bit_offset += 20 end
+function bit_buffer:write_i22(i22:number) buffer.writebits(self.buffer, self.bit_offset, 22, i22+2^21) self.bit_offset += 22 end
+function bit_buffer:write_i24(i24:number) buffer.writebits(self.buffer, self.bit_offset, 24, i24+2^23) self.bit_offset += 24 end
+function bit_buffer:write_i26(i26:number) buffer.writebits(self.buffer, self.bit_offset, 26, i26+2^25) self.bit_offset += 26 end
+function bit_buffer:write_i28(i28:number) buffer.writebits(self.buffer, self.bit_offset, 28, i28+2^27) self.bit_offset += 28 end
+function bit_buffer:write_i30(i30:number) buffer.writebits(self.buffer, self.bit_offset, 30, i30+2^29) self.bit_offset += 30 end
+function bit_buffer:write_i32(i32:number) buffer.writebits(self.buffer, self.bit_offset, 32, i32+2^31) self.bit_offset += 32 end
+
+function bit_buffer:write_u2(u2:number) buffer.writebits(self.buffer, self.bit_offset, 2, u2) self.bit_offset += 2 end
+function bit_buffer:write_u4(u4:number) buffer.writebits(self.buffer, self.bit_offset, 4, u4) self.bit_offset += 4 end
+function bit_buffer:write_u6(u6:number) buffer.writebits(self.buffer, self.bit_offset, 6, u6) self.bit_offset += 6 end
+function bit_buffer:write_u8(u8:number) buffer.writebits(self.buffer, self.bit_offset, 8, u8) self.bit_offset += 8 end
+function bit_buffer:write_u10(u10:number) buffer.writebits(self.buffer, self.bit_offset, 10, u10) self.bit_offset += 10 end
+function bit_buffer:write_u12(u12:number) buffer.writebits(self.buffer, self.bit_offset, 12, u12) self.bit_offset += 12 end
+function bit_buffer:write_u14(u14:number) buffer.writebits(self.buffer, self.bit_offset, 14, u14) self.bit_offset += 14 end
+function bit_buffer:write_u16(u16:number) buffer.writebits(self.buffer, self.bit_offset, 16, u16) self.bit_offset += 16 end
+function bit_buffer:write_u18(u18:number) buffer.writebits(self.buffer, self.bit_offset, 18, u18) self.bit_offset += 18 end
+function bit_buffer:write_u20(u20:number) buffer.writebits(self.buffer, self.bit_offset, 20, u20) self.bit_offset += 20 end
+function bit_buffer:write_u22(u22:number) buffer.writebits(self.buffer, self.bit_offset, 22, u22) self.bit_offset += 22 end
+function bit_buffer:write_u24(u24:number) buffer.writebits(self.buffer, self.bit_offset, 24, u24) self.bit_offset += 24 end
+function bit_buffer:write_u26(u26:number) buffer.writebits(self.buffer, self.bit_offset, 26, u26) self.bit_offset += 26 end
+function bit_buffer:write_u28(u28:number) buffer.writebits(self.buffer, self.bit_offset, 28, u28) self.bit_offset += 28 end
+function bit_buffer:write_u30(u30:number) buffer.writebits(self.buffer, self.bit_offset, 30, u30) self.bit_offset += 30 end
+function bit_buffer:write_u32(u32:number) buffer.writebits(self.buffer, self.bit_offset, 32, u32) self.bit_offset += 32 end
+
+function bit_buffer:read_i2() self.bit_offset -= 2 return buffer.readbits(self.buffer, self.bit_offset, 2) - 2^1 end
+function bit_buffer:read_i4() self.bit_offset -= 4 return buffer.readbits(self.buffer, self.bit_offset, 4) - 2^3 end
+function bit_buffer:read_i6() self.bit_offset -= 6 return buffer.readbits(self.buffer, self.bit_offset, 6) - 2^5 end
+function bit_buffer:read_i8() self.bit_offset -= 8 return buffer.readbits(self.buffer, self.bit_offset, 8) - 2^7 end
+function bit_buffer:read_i10() self.bit_offset -= 10 return buffer.readbits(self.buffer, self.bit_offset, 10) - 2^9 end
+function bit_buffer:read_i12() self.bit_offset -= 12 return buffer.readbits(self.buffer, self.bit_offset, 12) - 2^11 end
+function bit_buffer:read_i14() self.bit_offset -= 14 return buffer.readbits(self.buffer, self.bit_offset, 14) - 2^13 end
+function bit_buffer:read_i16() self.bit_offset -= 16 return buffer.readbits(self.buffer, self.bit_offset, 16) - 2^15 end
+function bit_buffer:read_i18() self.bit_offset -= 18 return buffer.readbits(self.buffer, self.bit_offset, 18) - 2^17 end
+function bit_buffer:read_i20() self.bit_offset -= 20 return buffer.readbits(self.buffer, self.bit_offset, 20) - 2^19 end
+function bit_buffer:read_i22() self.bit_offset -= 22 return buffer.readbits(self.buffer, self.bit_offset, 22) - 2^21 end
+function bit_buffer:read_i24() self.bit_offset -= 24 return buffer.readbits(self.buffer, self.bit_offset, 24) - 2^23 end
+function bit_buffer:read_i26() self.bit_offset -= 26 return buffer.readbits(self.buffer, self.bit_offset, 26) - 2^25 end
+function bit_buffer:read_i28() self.bit_offset -= 28 return buffer.readbits(self.buffer, self.bit_offset, 28) - 2^27 end
+function bit_buffer:read_i30() self.bit_offset -= 30 return buffer.readbits(self.buffer, self.bit_offset, 30) - 2^29 end
+function bit_buffer:read_i32() self.bit_offset -= 32 return buffer.readbits(self.buffer, self.bit_offset, 32) - 2^31 end
+
+
+return bit_buffer
