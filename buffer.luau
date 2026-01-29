@@ -4,7 +4,6 @@
 	
 	Upcoming changes:
 	Adding physics methods such as writing & reading CFrames, etc
-	Adding 24 bit types
 	
 	
 	You must add your own buffer_module:write_foobar() function & type
